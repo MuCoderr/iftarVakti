@@ -11,7 +11,7 @@ import { setPrayerTimes } from '../redux/slices/prayerTimes';
 export default function Prayer() {
   const [districtID, setDistrictID] = useState(null);
   const [todayPrayerTimes, setTodayPrayerTimes] = useState<any | null>(null);
-  const [tomorrowPrayerTimes, setTomorrowPrayerTimes] = useState<any | null>(null); // Yarın için namaz vakitlerini ekledik
+  const [tomorrowPrayerTimes, setTomorrowPrayerTimes] = useState<any | null>(null);
   const [timeRemainingImsak, setTimeRemainingImsak] = useState<string>('');
   const [timeRemainingAkşam, setTimeRemainingAkşam] = useState<string>('');
   const [isImsakTime, setIsImsakTime] = useState<boolean>(false);
@@ -29,29 +29,23 @@ export default function Prayer() {
       setDistrictID(districtValue);
     };
 
-    getDistrictValue(); // İlk olarak ilçe kodunu al
+    getDistrictValue();
 
     const getPrayerTimesDateFromAsyncStorage = async () => {
       const prayerTimesDate: any = await AsyncStorage.getItem('prayerTimesDate');
       setFirstDate(prayerTimesDate);
 
       if (prayerTimesDate) {
-        // Check if data is retrieved successfully
         const today = new Date();
         const firstDate = new Date(prayerTimesDate);
         const differenceInMilliseconds = today.getTime() - firstDate.getTime();
         const differenceInDays = Math.floor(differenceInMilliseconds / (1000 * 3600 * 24));
-        // console.error('Gün farkı', differenceInDays);
 
         if (differenceInDays >= 1) {
           const data = await getPrayerTimes(districtID);
           dispatch(setPrayerTimes(data));
           await AsyncStorage.setItem('prayerTimes', JSON.stringify(data));
           await AsyncStorage.setItem('prayerTimesDate', new Date().toISOString());
-
-          // console.warn('Namaz Vakitleri Güncellendi');
-          // console.error('Namaz vakti ilk gün', prayerTimesDate);
-          // console.error(prayerTimesData);
         }
       }
     };
@@ -66,14 +60,14 @@ export default function Prayer() {
         if (prayerTimesData) {
           const prayerTimes = JSON.parse(prayerTimesData);
           dispatch(setPrayerTimes(prayerTimes)); // Veriyi store'a aktar
-          // console.warn("kayıtlı namaz vakti verileri local'den çekildi");
+          console.warn("kayıtlı namaz vakti verileri local'den çekildi");
           return prayerTimes;
         }
 
         // Veri daha önce kaydedilmemişse API'dan çek ve kaydet
         const data = await getPrayerTimes(districtID);
         dispatch(setPrayerTimes(data));
-        // console.warn("localde namaz vakitleri olmadığından api'dan çekildi");
+        console.warn("localde namaz vakitleri olmadığından api'dan çekildi");
 
         await AsyncStorage.setItem('prayerTimes', JSON.stringify(data));
         await AsyncStorage.setItem('prayerTimesDate', new Date().toISOString());
@@ -84,10 +78,10 @@ export default function Prayer() {
       getPrayerTimesFromAsyncStorage().then((data) => {
         const today = new Date();
         const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1); // Yarın için tarihi hesapla
+        tomorrow.setDate(tomorrow.getDate() + 1);
 
         const day = String(today.getDate()).padStart(2, '0');
-        const month = String(today.getMonth() + 1).padStart(2, '0'); // Ocak 0'dan başlar
+        const month = String(today.getMonth() + 1).padStart(2, '0');
         const year = today.getFullYear();
 
         const formattedToday = `${day}.${month}.${year}`;
@@ -101,7 +95,6 @@ export default function Prayer() {
         setTodayPrayerTimes(todayPrayerTimes);
         setTomorrowPrayerTimes(tomorrowPrayerTimes);
 
-        // Imsak ve akşam vaktine kalan süreyi hesapla ve güncelle
         if (todayPrayerTimes) {
           const imsakTime = todayPrayerTimes.Imsak.split(':');
           const imsakDate = new Date();
@@ -118,30 +111,42 @@ export default function Prayer() {
           const now = new Date();
 
           if (now > akşamDate) {
-            imsakDate.setDate(imsakDate.getDate() + 1); // Bir sonraki imsak vaktine geç
+            imsakDate.setDate(imsakDate.getDate() + 1);
           }
 
-          const timeDifferenceImsak = imsakDate.getTime() - now.getTime();
-          const timeDifferenceAkşam = akşamDate.getTime() - now.getTime();
+          let timeDifferenceImsak = imsakDate.getTime() - now.getTime();
+          let timeDifferenceAkşam = akşamDate.getTime() - now.getTime();
+
+          if (now > akşamDate) {
+            timeDifferenceImsak = imsakDate.getTime() - now.getTime();
+            timeDifferenceAkşam += 24 * 60 * 60 * 1000;
+          }
+
           const timeRemainingStringImsak = formatTimeRemaining(timeDifferenceImsak);
           const timeRemainingStringAkşam = formatTimeRemaining(timeDifferenceAkşam);
           setTimeRemainingImsak(timeRemainingStringImsak);
           setTimeRemainingAkşam(timeRemainingStringAkşam);
-          setIsImsakTime(now < imsakDate); // Şu an imsak vaktine kadar olan sürede miyiz?
+          setIsImsakTime(now < imsakDate);
 
           // Zamanlayıcı oluştur ve her saniyede bir zamanı güncelle
           const timer = setInterval(() => {
             const now = new Date();
-            const timeDifferenceImsak = imsakDate.getTime() - now.getTime();
-            const timeDifferenceAkşam = akşamDate.getTime() - now.getTime();
+            let timeDifferenceImsak = imsakDate.getTime() - now.getTime();
+            let timeDifferenceAkşam = akşamDate.getTime() - now.getTime();
+
+            if (now > akşamDate) {
+              timeDifferenceImsak = imsakDate.getTime() - now.getTime();
+              timeDifferenceAkşam += 24 * 60 * 60 * 1000;
+            }
+
             const timeRemainingStringImsak = formatTimeRemaining(timeDifferenceImsak);
             const timeRemainingStringAkşam = formatTimeRemaining(timeDifferenceAkşam);
             setTimeRemainingImsak(timeRemainingStringImsak);
             setTimeRemainingAkşam(timeRemainingStringAkşam);
-            setIsImsakTime(now < imsakDate); // Şu an imsak vaktine kadar olan sürede miyiz?
+            setIsImsakTime(now < imsakDate);
           }, 1000);
 
-          return () => clearInterval(timer); // Temizleme fonksiyonu
+          return () => clearInterval(timer);
         }
       });
 
@@ -156,8 +161,11 @@ export default function Prayer() {
     }
   }, [districtID]);
 
-  // Kullanılacak zaman formatı
   const formatTimeRemaining = (milliseconds: number): string => {
+    if (milliseconds <= 0) {
+      return 'Süre dolmuş';
+    }
+
     const totalSeconds = Math.floor(milliseconds / 1000);
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
