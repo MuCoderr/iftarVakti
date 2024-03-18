@@ -1,30 +1,31 @@
-import { Stack, Link } from 'expo-router';
-import { Text, TouchableOpacity, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator } from 'react-native';
 
-export default function Page() {
+import LocationSelect from './locationSelect';
+import Prayer from './prayer';
+
+export default function index() {
+  const [locationSelect, setLocationSelect] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const getSelectedLocation = async () => {
+      try {
+        const selectedLocation: any = await AsyncStorage.getItem(`selectedLocation`);
+        setLocationSelect(selectedLocation);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    getSelectedLocation();
+  }, []);
+
   return (
-    <View className={styles.container}>
-      <Stack.Screen options={{ title: 'Overview' }} />
-      <View className={styles.main}>
-        <View>
-          <Text className={styles.title}>Hello World</Text>
-          <Text className={styles.subtitle}>This is the first page of your app.</Text>
-        </View>
-        <Link href={{ pathname: '/details', params: { name: 'Dan' } }} asChild>
-          <TouchableOpacity className={styles.button}>
-            <Text className={styles.buttonText}>Show Details</Text>
-          </TouchableOpacity>
-        </Link>
-      </View>
-    </View>
+    <>
+      {isLoading ? <ActivityIndicator /> : <>{locationSelect ? <Prayer /> : <LocationSelect />}</>}
+    </>
   );
 }
-
-const styles = {
-  button: 'items-center bg-indigo-500 rounded-[28px] shadow-md p-4',
-  buttonText: 'text-white text-lg font-semibold text-center',
-  container: 'flex-1 p-6',
-  main: 'flex-1 max-w-[960] justify-between',
-  title: 'text-[64px] font-bold',
-  subtitle: 'text-4xl text-gray-700',
-};
