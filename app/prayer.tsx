@@ -4,9 +4,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Stack, router } from 'expo-router';
 import { Text, TouchableOpacity, View, ImageBackground } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { DateTime, Interval } from 'luxon';
 
 import { getPrayerTimes } from '../redux/api';
-import { setPrayerTimes } from '../redux/slices/prayerTimes';
+import prayerTimes, { setPrayerTimes } from '../redux/slices/prayerTimes';
 
 export default function Prayer() {
   const [districtID, setDistrictID] = useState(null);
@@ -14,12 +15,12 @@ export default function Prayer() {
   const [tomorrowPrayerTimes, setTomorrowPrayerTimes] = useState<any | null>(null);
   const [timeRemainingImsak, setTimeRemainingImsak] = useState<string>('');
   const [timeRemainingAkşam, setTimeRemainingAkşam] = useState<string>('');
-  const [isImsakTime, setIsImsakTime] = useState<boolean>(false);
+  const [isImsakTime, setIsImsakTime] = useState<boolean>();
+  const [nextPrayer, setNextPrayer] = useState<string>('');
+  const [nextVakit, setNextVakit] = useState<string>('');
   const [cityName, setCityName] = useState<string | null>('');
   const [districtName, setDistrictName] = useState<string | null>('');
   const [firstDate, setFirstDate] = useState<any>('');
-
-  const prayerTimesData = useSelector((state: any) => state.prayerTimes.prayerTimes);
 
   const dispatch = useDispatch();
 
@@ -60,14 +61,14 @@ export default function Prayer() {
         if (prayerTimesData) {
           const prayerTimes = JSON.parse(prayerTimesData);
           dispatch(setPrayerTimes(prayerTimes)); // Veriyi store'a aktar
-          console.warn("kayıtlı namaz vakti verileri local'den çekildi");
+          // console.warn("kayıtlı namaz vakti verileri local'den çekildi");
           return prayerTimes;
         }
 
         // Veri daha önce kaydedilmemişse API'dan çek ve kaydet
         const data = await getPrayerTimes(districtID);
         dispatch(setPrayerTimes(data));
-        console.warn("localde namaz vakitleri olmadığından api'dan çekildi");
+        //  console.warn("localde namaz vakitleri olmadığından api'dan çekildi");
 
         await AsyncStorage.setItem('prayerTimes', JSON.stringify(data));
         await AsyncStorage.setItem('prayerTimesDate', new Date().toISOString());
@@ -96,57 +97,101 @@ export default function Prayer() {
         setTomorrowPrayerTimes(tomorrowPrayerTimes);
 
         if (todayPrayerTimes) {
-          const imsakTime = todayPrayerTimes.Imsak.split(':');
-          const imsakDate = new Date();
-          imsakDate.setHours(Number(imsakTime[0]));
-          imsakDate.setMinutes(Number(imsakTime[1]));
-          imsakDate.setSeconds(0);
+          const timeRemaining = () => {
+            const suankiSaat = DateTime.now();
+            const imsakVakti = DateTime.fromISO(todayPrayerTimes.Imsak);
+            const tomorrowImsakVakti = DateTime.fromISO(tomorrowPrayerTimes.Imsak);
+            const aksamVakti = DateTime.fromISO(todayPrayerTimes.Aksam);
+            imsakVakti < suankiSaat && setIsImsakTime(false);
+            suankiSaat > aksamVakti && setIsImsakTime(true);
 
-          const akşamTime = todayPrayerTimes.Aksam.split(':');
-          const akşamDate = new Date();
-          akşamDate.setHours(Number(akşamTime[0]));
-          akşamDate.setMinutes(Number(akşamTime[1]));
-          akşamDate.setSeconds(0);
-
-          const now = new Date();
-
-          if (now > akşamDate) {
-            imsakDate.setDate(imsakDate.getDate() + 1);
-          }
-
-          let timeDifferenceImsak = imsakDate.getTime() - now.getTime();
-          let timeDifferenceAkşam = akşamDate.getTime() - now.getTime();
-
-          if (now > akşamDate) {
-            timeDifferenceImsak = imsakDate.getTime() - now.getTime();
-            timeDifferenceAkşam += 24 * 60 * 60 * 1000;
-          }
-
-          const timeRemainingStringImsak = formatTimeRemaining(timeDifferenceImsak);
-          const timeRemainingStringAkşam = formatTimeRemaining(timeDifferenceAkşam);
-          setTimeRemainingImsak(timeRemainingStringImsak);
-          setTimeRemainingAkşam(timeRemainingStringAkşam);
-          setIsImsakTime(now < imsakDate);
-
-          // Zamanlayıcı oluştur ve her saniyede bir zamanı güncelle
-          const timer = setInterval(() => {
-            const now = new Date();
-            let timeDifferenceImsak = imsakDate.getTime() - now.getTime();
-            let timeDifferenceAkşam = akşamDate.getTime() - now.getTime();
-
-            if (now > akşamDate) {
-              timeDifferenceImsak = imsakDate.getTime() - now.getTime();
-              timeDifferenceAkşam += 24 * 60 * 60 * 1000;
+            if (suankiSaat < imsakVakti) {
+              // Şu an imsak vaktinden önce
+              const kalanSureInterval = Interval.fromDateTimes(suankiSaat, imsakVakti);
+              const kalanSureString: any = kalanSureInterval
+                .toDuration(['hours', 'minutes', 'seconds'])
+                .toObject();
+              setTimeRemainingImsak(
+                formatTime(kalanSureString.hours, kalanSureString.minutes, kalanSureString.seconds)
+              );
+            } else if (suankiSaat < aksamVakti) {
+              // Şu an imsak vaktinden sonra ve akşam vaktinden önce
+              const kalanSureInterval = Interval.fromDateTimes(suankiSaat, aksamVakti);
+              const kalanSureString: any = kalanSureInterval
+                .toDuration(['hours', 'minutes', 'seconds'])
+                .toObject();
+              setTimeRemainingAkşam(
+                formatTime(kalanSureString.hours, kalanSureString.minutes, kalanSureString.seconds)
+              );
+            } else {
+              // Şu an akşam vaktinden sonra
+              const imsakVaktiYarin = tomorrowImsakVakti.plus({ days: 1 });
+              const kalanSureInterval = Interval.fromDateTimes(suankiSaat, imsakVaktiYarin);
+              const kalanSureString: any = kalanSureInterval
+                .toDuration(['hours', 'minutes', 'seconds'])
+                .toObject();
+              setTimeRemainingImsak(
+                formatTime(kalanSureString.hours, kalanSureString.minutes, kalanSureString.seconds)
+              );
             }
 
-            const timeRemainingStringImsak = formatTimeRemaining(timeDifferenceImsak);
-            const timeRemainingStringAkşam = formatTimeRemaining(timeDifferenceAkşam);
-            setTimeRemainingImsak(timeRemainingStringImsak);
-            setTimeRemainingAkşam(timeRemainingStringAkşam);
-            setIsImsakTime(now < imsakDate);
-          }, 1000);
+            const namazVakitleri = {
+              imsak: todayPrayerTimes.Imsak,
+              gunes: todayPrayerTimes.Gunes,
+              ogle: todayPrayerTimes.Ogle,
+              ikindi: todayPrayerTimes.Ikindi,
+              aksam: todayPrayerTimes.Aksam,
+              yatsi: todayPrayerTimes.Yatsi,
+            };
 
-          return () => clearInterval(timer);
+            let nextPrayerFound = false;
+
+            // Her bir vakit için kalan süreleri kontrol eder
+            for (const [vakit, vakitSaat] of Object.entries(namazVakitleri)) {
+              const vakitDateTime = DateTime.fromISO(vakitSaat);
+              if (vakitDateTime > suankiSaat && !nextPrayerFound) {
+                const kalanSureInterval = Interval.fromDateTimes(suankiSaat, vakitDateTime);
+                const kalanSureString: any = kalanSureInterval
+                  .toDuration(['hours', 'minutes', 'seconds'])
+                  .toObject();
+
+                let vakitString = '';
+                vakit === 'imsak'
+                  ? (vakitString = 'İmsak')
+                  : vakit === 'gunes'
+                    ? (vakitString = 'Güneş')
+                    : vakit === 'ogle'
+                      ? (vakitString = 'Öğle')
+                      : vakit === 'ikindi'
+                        ? (vakitString = 'İkindi')
+                        : vakit === 'aksam'
+                          ? (vakitString = 'Akşam')
+                          : vakit === 'yatsi'
+                            ? (vakitString = 'Yatsı')
+                            : '';
+
+                setNextVakit(`${vakitString}`);
+                setNextPrayer(
+                  formatTime(
+                    kalanSureString.hours,
+                    kalanSureString.minutes,
+                    kalanSureString.seconds
+                  )
+                );
+                nextPrayerFound = true;
+              }
+            }
+
+            if (!nextPrayerFound) {
+              setNextPrayer('Bugün için son namaz vakti geçmiş.');
+            }
+          };
+
+          timeRemaining();
+
+          const intervalId = setInterval(timeRemaining, 1000);
+          // Komponent unmount olduğunda clearInterval kullanarak güncelleme işlemini durdur
+          return () => clearInterval(intervalId);
         }
       });
 
@@ -159,19 +204,7 @@ export default function Prayer() {
       };
       getCityNameAndDistrictNameFromAsyncStorage();
     }
-  }, [districtID]);
-
-  const formatTimeRemaining = (milliseconds: number): string => {
-    if (milliseconds <= 0) {
-      return 'Süre dolmuş';
-    }
-
-    const totalSeconds = Math.floor(milliseconds / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  };
+  }, [districtID, nextVakit]);
 
   function formatDate(date: Date) {
     const day = String(date.getDate()).padStart(2, '0');
@@ -179,6 +212,14 @@ export default function Prayer() {
     const year = date.getFullYear();
     return `${day}.${month}.${year}`;
   }
+
+  // Saat, dakika ve saniye değerlerini iki haneli olarak biçimlendiren yardımcı bir fonksiyon
+  const formatTime = (hours: number, minutes: number, seconds: number) => {
+    const formattedHours = String(hours).padStart(2, '0');
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedSeconds = String(Math.floor(seconds)).padStart(2, '0');
+    return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+  };
 
   const PrayerTimeItem = ({ title, time }: any) => {
     return (
@@ -201,7 +242,6 @@ export default function Prayer() {
             <TouchableOpacity
               onPress={() => {
                 AsyncStorage.clear();
-                // console.error('AsyncStorage tüm verisi silindi');
                 router.navigate('/locationSelect');
               }}>
               <View className="flex-row items-center">
@@ -213,34 +253,47 @@ export default function Prayer() {
             </TouchableOpacity>
           </View>
 
-          <View className="flex-auto items-center ">
-            {todayPrayerTimes && (
-              <>
+          {todayPrayerTimes ? (
+            <>
+              <View className="flex-auto items-center ">
                 <Text className="mb-[10] color-[#171717]/50">
                   {todayPrayerTimes.HicriTarihKisa} / {todayPrayerTimes.MiladiTarihKisa}
                 </Text>
-              </>
-            )}
-            <Text className="font-bold text-2xl mb-[15]">
-              {isImsakTime ? 'İmsak Vaktine Kalan Süre' : ' İftar Vaktine Kalan Süre'}
-            </Text>
-            <Text className="p-1 text-8xl font-extrabold color-[#DA0037]">
-              {isImsakTime ? timeRemainingImsak : timeRemainingAkşam}
-            </Text>
-          </View>
 
-          <View className="flex-auto flex-row justify-between mt-[150]">
-            {todayPrayerTimes && (
-              <>
-                <PrayerTimeItem title="İmsak" time={todayPrayerTimes.Imsak} />
-                <PrayerTimeItem title="Güneş" time={todayPrayerTimes.Gunes} />
-                <PrayerTimeItem title="Öğle" time={todayPrayerTimes.Ogle} />
-                <PrayerTimeItem title="İkindi" time={todayPrayerTimes.Ikindi} />
-                <PrayerTimeItem title="Akşam" time={todayPrayerTimes.Aksam} />
-                <PrayerTimeItem title="Yatsı" time={todayPrayerTimes.Yatsi} />
-              </>
-            )}
-          </View>
+                <Text className="font-bold text-2xl">
+                  {isImsakTime ? 'İmsak Vaktine Kalan Süre' : ' İftar Vaktine Kalan Süre'}
+                </Text>
+                <Text className="text-[80px] font-extrabold color-[#DA0037]">
+                  {isImsakTime ? timeRemainingImsak : timeRemainingAkşam}
+                </Text>
+                <View className="flex-row gap-[60] -mt-3 ">
+                  <Text className="color-[#171717]/50">saat</Text>
+                  <Text className="color-[#171717]/50">dakika</Text>
+                  <Text className="color-[#171717]/50">saniye</Text>
+                </View>
+              </View>
+
+              <View className="flex-auto justify-end mb-[100] items-center ">
+                <View className="mb-3">
+                  <Text className="font-bold  text-2xl">
+                    {nextVakit} Vaktine <Text className=" color-[#DA0037]">{nextPrayer}</Text>
+                  </Text>
+                </View>
+                <View className=" flex-row">
+                  <PrayerTimeItem title="İmsak" time={todayPrayerTimes.Imsak} />
+                  <PrayerTimeItem title="Güneş" time={todayPrayerTimes.Gunes} />
+                  <PrayerTimeItem title="Öğle" time={todayPrayerTimes.Ogle} />
+                  <PrayerTimeItem title="İkindi" time={todayPrayerTimes.Ikindi} />
+                  <PrayerTimeItem title="Akşam" time={todayPrayerTimes.Aksam} />
+                  <PrayerTimeItem title="Yatsı" time={todayPrayerTimes.Yatsi} />
+                </View>
+              </View>
+            </>
+          ) : (
+            <View className="flex-1 justify-center items-center">
+              <Text>...</Text>
+            </View>
+          )}
         </View>
       </ImageBackground>
     </>
