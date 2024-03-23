@@ -102,11 +102,10 @@ export default function Prayer() {
             const imsakVakti = DateTime.fromISO(todayPrayerTimes.Imsak);
             const tomorrowImsakVakti = DateTime.fromISO(tomorrowPrayerTimes.Imsak);
             const aksamVakti = DateTime.fromISO(todayPrayerTimes.Aksam);
-            imsakVakti < suankiSaat && setIsImsakTime(false);
-            suankiSaat > aksamVakti && setIsImsakTime(true);
 
             if (suankiSaat < imsakVakti) {
               // Şu an imsak vaktinden önce
+              setIsImsakTime(true);
               const kalanSureInterval = Interval.fromDateTimes(suankiSaat, imsakVakti);
               const kalanSureString: any = kalanSureInterval
                 .toDuration(['hours', 'minutes', 'seconds'])
@@ -116,6 +115,7 @@ export default function Prayer() {
               );
             } else if (suankiSaat < aksamVakti) {
               // Şu an imsak vaktinden sonra ve akşam vaktinden önce
+              setIsImsakTime(false);
               const kalanSureInterval = Interval.fromDateTimes(suankiSaat, aksamVakti);
               const kalanSureString: any = kalanSureInterval
                 .toDuration(['hours', 'minutes', 'seconds'])
@@ -125,6 +125,7 @@ export default function Prayer() {
               );
             } else {
               // Şu an akşam vaktinden sonra
+              setIsImsakTime(true);
               const imsakVaktiYarin = tomorrowImsakVakti.plus({ days: 1 });
               const kalanSureInterval = Interval.fromDateTimes(suankiSaat, imsakVaktiYarin);
               const kalanSureString: any = kalanSureInterval
@@ -183,7 +184,7 @@ export default function Prayer() {
             }
 
             if (!nextPrayerFound) {
-              setNextPrayer('Bugün için son namaz vakti geçmiş.');
+              setNextPrayer('');
             }
           };
 
@@ -257,7 +258,7 @@ export default function Prayer() {
             <>
               <View className="flex-auto items-center ">
                 <Text className="mb-[10] color-[#171717]/50">
-                  {todayPrayerTimes.HicriTarihKisa} / {todayPrayerTimes.MiladiTarihKisa}
+                  {todayPrayerTimes.HicriTarihUzun} / {todayPrayerTimes.MiladiTarihKisa}
                 </Text>
 
                 <Text className="font-bold text-2xl">
@@ -275,9 +276,11 @@ export default function Prayer() {
 
               <View className="flex-auto justify-end mb-[100] items-center ">
                 <View className="mb-3">
-                  <Text className="font-bold  text-2xl">
-                    {nextVakit} Vaktine <Text className=" color-[#DA0037]">{nextPrayer}</Text>
-                  </Text>
+                  {nextPrayer && (
+                    <Text className="font-bold  text-2xl">
+                      {nextVakit} Vaktine <Text className=" color-[#DA0037]">{nextPrayer}</Text>
+                    </Text>
+                  )}
                 </View>
                 <View className=" flex-row">
                   <PrayerTimeItem title="İmsak" time={todayPrayerTimes.Imsak} />
