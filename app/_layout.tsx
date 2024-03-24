@@ -7,7 +7,9 @@ import '../global.css';
 export default function _layout() {
   return (
     <Provider store={store}>
-      <Stack />
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      </Stack>
     </Provider>
   );
 }

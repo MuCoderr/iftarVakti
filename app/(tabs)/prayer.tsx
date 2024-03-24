@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { FontAwesome6 } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Stack, router } from 'expo-router';
-import { Text, TouchableOpacity, View, ImageBackground } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { Text, TouchableOpacity, View, ImageBackground, ActivityIndicator } from 'react-native';
+import { useDispatch } from 'react-redux';
 import { DateTime, Interval } from 'luxon';
 
-import { getPrayerTimes } from '../redux/api';
-import prayerTimes, { setPrayerTimes } from '../redux/slices/prayerTimes';
+import { getPrayerTimes } from '../../redux/api';
+import prayerTimes, { setPrayerTimes } from '../../redux/slices/prayerTimes';
 
 export default function Prayer() {
   const [districtID, setDistrictID] = useState(null);
@@ -235,7 +235,7 @@ export default function Prayer() {
     <>
       <Stack.Screen options={{ headerShown: false }} />
       <ImageBackground
-        source={require('../assets/images/background.png')}
+        source={require('../../assets/images/background.png')}
         className="flex-1"
         imageStyle={{ opacity: 0.2 }}>
         <View className="flex-1 justify-between items-center ">
@@ -274,7 +274,7 @@ export default function Prayer() {
                 </View>
               </View>
 
-              <View className="flex-auto justify-end mb-[100] items-center ">
+              <View className="flex-auto justify-end mb-[90] items-center ">
                 <View className="mb-3">
                   {nextPrayer && (
                     <Text className="font-bold  text-2xl">
@@ -294,7 +294,7 @@ export default function Prayer() {
             </>
           ) : (
             <View className="flex-1 justify-center items-center">
-              <Text>...</Text>
+              <ActivityIndicator />
             </View>
           )}
         </View>

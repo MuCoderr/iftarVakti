@@ -6,10 +6,10 @@ import { ImageBackground, StyleSheet, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { getCountries, getCities, getDistricts } from '../redux/api';
-import { setCities, setSelectedCityId } from '../redux/slices/cities';
-import { setCountries, setSelectedCountryId } from '../redux/slices/countries';
-import { setDistricts, setSelectedDistrictsId } from '../redux/slices/districts';
+import { getCountries, getCities, getDistricts } from '../../redux/api';
+import { setCities, setSelectedCityId } from '../../redux/slices/cities';
+import { setCountries, setSelectedCountryId } from '../../redux/slices/countries';
+import { setDistricts, setSelectedDistrictsId } from '../../redux/slices/districts';
 
 const DropdownComponent = () => {
   const [isCountriesFocus, setIsCountriesFocus] = useState(false);
@@ -136,7 +136,7 @@ const DropdownComponent = () => {
   return (
     <>
       <ImageBackground
-        source={require('../assets/images/background.png')}
+        source={require('../../assets/images/background.png')}
         className="flex-1"
         imageStyle={{ opacity: 0.1 }}>
         <Stack.Screen options={{ headerShown: false }} />

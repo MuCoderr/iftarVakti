@@ -2,7 +2,7 @@
   "expo": {
     "name": "iftarVakti",
     "slug": "iftarVakti",
-    "version": "1.0.1",
+    "version": "1.0.3",
     "scheme": "iftarVakti",
     "web": {
       "bundler": "metro",
@@ -32,7 +32,7 @@
     },
     "android": {
       "package": "com.imsakVakti",
-      "versionCode": 2,
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
