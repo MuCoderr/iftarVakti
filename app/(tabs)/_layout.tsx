@@ -19,14 +19,14 @@ export default function _layout() {
             elevation: 0,
           },
         }}>
-        <Tabs.Screen
+        {/* <Tabs.Screen
           name="index"
           options={{
             title: 'Home',
             headerShown: false,
             href: null,
           }}
-        />
+        /> */}
         <Tabs.Screen
           name="locationSelect"
           options={{
