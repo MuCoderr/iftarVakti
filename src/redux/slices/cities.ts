@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { City } from '../types';
+import { City } from '../../../redux/types';
 
 const initialState: {
   cities: City[];

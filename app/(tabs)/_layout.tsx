@@ -1,6 +1,6 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { store } from '../../redux/store';
+import { store } from '../../src/redux/store';
 import { Provider } from 'react-redux';
 import { MaterialIcons } from '@expo/vector-icons';
 import '../../global.css';
