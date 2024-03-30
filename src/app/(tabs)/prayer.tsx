@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { View, ImageBackground, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // Components
-import LocationItem from '~/src/components/locationItem';
-import ImsakAndIftarCountdown from '~/src/components/imsakAndIftarCountdown';
-import PrayerTimesItem from '~/src/components/prayerTimesItem';
-import FetchPrayerTimes from '~/src/components/fetchPrayerTimes';
+import LocationItem from '../../components/locationItem';
+import ImsakAndIftarCountdown from '../../components/imsakAndIftarCountdown';
+import PrayerTimesItem from '../../components/prayerTimesItem';
+import FetchPrayerTimes from '../../components/fetchPrayerTimes';
 
 export default function Prayer() {
   const [districtID, setDistrictID] = useState(null);
@@ -27,7 +27,7 @@ export default function Prayer() {
   return (
     <>
       <ImageBackground
-        source={require('../../src/assets/images/background.png')}
+        source={require('../../assets/images/background.png')}
         className="flex-1"
         imageStyle={{ opacity: 0.2 }}>
         <FetchPrayerTimes

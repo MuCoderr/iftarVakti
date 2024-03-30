@@ -26,7 +26,7 @@ const useAppState = () => {
       if (locationSelect) {
         router.replace('/(tabs)/prayer');
       } else {
-        router.replace('/(tabs)/locationSelect');
+        router.replace('/locationSelect');
       }
     }
   }, [isLoading, locationSelect]);

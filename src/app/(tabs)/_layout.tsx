@@ -1,9 +1,9 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { store } from '../../src/redux/store';
+import { store } from '../../redux/store';
 import { Provider } from 'react-redux';
 import { MaterialIcons } from '@expo/vector-icons';
-import '../../global.css';
+import '../../../global.css';
 
 export default function _layout() {
   return (
@@ -27,7 +27,7 @@ export default function _layout() {
             href: null,
           }}
         /> */}
-        <Tabs.Screen
+        {/* <Tabs.Screen
           name="locationSelect"
           options={{
             title: 'LocationSelect',
@@ -35,7 +35,7 @@ export default function _layout() {
             tabBarStyle: { display: 'none' },
             href: null,
           }}
-        />
+        /> */}
         <Tabs.Screen
           name="prayer"
           options={{

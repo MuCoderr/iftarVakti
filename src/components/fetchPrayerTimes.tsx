@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // Redux
-import { getPrayerTimes } from '~/src/redux/api';
+import { getPrayerTimes } from '../redux/api';
 import { useDispatch } from 'react-redux';
-import { setPrayerTimes } from '~/src/redux/slices/prayerTimes';
+import { setPrayerTimes } from '../redux/slices/prayerTimes';
 // Utils
-import { formatDate } from '~/src/utils/functions';
+import { formatDate } from '../utils/functions';
 
 interface FetchPrayerTimesProps {
   districtID: any;
