@@ -1,9 +1,8 @@
+import { lightColors, darkColors } from './src/utils/colors';
 /** @type {import('tailwindcss').Config} */
 
-import { lightColors, darkColors } from './src/utils/colors';
-
 module.exports = {
-  content: ['./index.{js,ts,tsx}', './src/**/*.{js,ts,tsx}'],
+  content: ['./src/**/*.{js,ts,tsx}', './index.{js,ts,tsx}'],
 
   presets: [require('nativewind/preset')],
   theme: {

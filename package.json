@@ -1,6 +1,6 @@
 {
   "name": "iftarVakti",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "scripts": {
     "android": "expo start --android",
     "format": "eslint \"**/*.{js,jsx,ts,tsx}\" --fix && prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
