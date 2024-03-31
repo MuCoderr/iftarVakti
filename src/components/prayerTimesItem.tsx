@@ -1,6 +1,5 @@
 import { Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { lightColors, darkColors } from 'src/utils/colors';
 import { DateTime, Interval } from 'luxon';
 import { formatTime } from '../utils/functions';
 
@@ -10,7 +9,6 @@ interface PrayerTimeItemProps {
 export default function PrayerTimesItem({ todayPrayerTimes }: PrayerTimeItemProps) {
   const [nextPrayer, setNextPrayer] = useState<string>('');
   const [nextVakit, setNextVakit] = useState<string>('');
-  const color = lightColors;
 
   useEffect(() => {
     if (todayPrayerTimes) {
@@ -76,8 +74,8 @@ export default function PrayerTimesItem({ todayPrayerTimes }: PrayerTimeItemProp
   const PrayerTimeItem = ({ title, time }: any) => {
     return (
       <View className="justify-center items-center mb-[5] mx-2">
-        <Text className="font-bold">{title}</Text>
-        <Text className="font-semibold color-[#DA0037]">{time}</Text>
+        <Text className="font-bold color-light-secondary dark:color-dark-secondary">{title}</Text>
+        <Text className="font-semibold color-light-primary dark:color-dark-primary">{time}</Text>
       </View>
     );
   };
@@ -86,8 +84,9 @@ export default function PrayerTimesItem({ todayPrayerTimes }: PrayerTimeItemProp
     <View className="flex-auto justify-end mb-[90] items-center ">
       <View className="mb-3">
         {nextPrayer && (
-          <Text className="font-bold  text-2xl">
-            {nextVakit} Vaktine <Text className={`color-[${color.primary}]`}>{nextPrayer}</Text>
+          <Text className="font-bold text-2xl color-light-secondary dark:color-dark-secondary">
+            {nextVakit} Vaktine{' '}
+            <Text className="color-light-primary dark:color-dark-primary">{nextPrayer}</Text>
           </Text>
         )}
       </View>

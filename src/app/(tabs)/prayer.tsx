@@ -6,11 +6,14 @@ import LocationItem from '../../components/locationItem';
 import ImsakAndIftarCountdown from '../../components/imsakAndIftarCountdown';
 import PrayerTimesItem from '../../components/prayerTimesItem';
 import FetchPrayerTimes from '../../components/fetchPrayerTimes';
+import { useColorScheme } from 'nativewind';
 
 export default function Prayer() {
   const [districtID, setDistrictID] = useState(null);
   const [todayPrayerTimes, setTodayPrayerTimes] = useState<any | null>(null);
   const [tomorrowPrayerTimes, setTomorrowPrayerTimes] = useState<any | null>(null);
+
+  const { colorScheme } = useColorScheme();
 
   useEffect(() => {
     const getDistrictValue = async () => {
@@ -20,16 +23,15 @@ export default function Prayer() {
     getDistrictValue();
   }, [districtID]);
 
-  // const backgroundImageSource = isDarkMode
-  //   ? require('../../assets/images/background.png')
-  //   : require('../../assets/images/backgroundDark.png');
-
   return (
     <>
       <ImageBackground
-        source={require('../../assets/images/background.png')}
-        className="flex-1"
-        imageStyle={{ opacity: 0.2 }}>
+        source={
+          colorScheme == 'light'
+            ? require('../../assets/images/backgroundLight.png')
+            : require('../../assets/images/backgroundDark.png')
+        }
+        className="flex-1">
         <FetchPrayerTimes
           districtID={districtID}
           setTodayPrayerTimes={setTodayPrayerTimes}

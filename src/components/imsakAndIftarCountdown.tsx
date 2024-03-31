@@ -1,6 +1,5 @@
 import { Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { lightColors, darkColors } from 'src/utils/colors';
 import { DateTime, Interval } from 'luxon';
 import { formatTime } from '../utils/functions';
 
@@ -16,8 +15,6 @@ export default function ImsakAndIftarCountdown({
   const [timeRemainingImsak, setTimeRemainingImsak] = useState<string>('');
   const [timeRemainingAkşam, setTimeRemainingAkşam] = useState<string>('');
   const [isImsakTime, setIsImsakTime] = useState<boolean>();
-
-  const color = lightColors;
 
   useEffect(() => {
     if (todayPrayerTimes && tomorrowPrayerTimes) {
@@ -71,20 +68,20 @@ export default function ImsakAndIftarCountdown({
 
   return (
     <View className="flex-auto items-center ">
-      <Text className={`mb-[10] color-[${color.secondary}]/50`}>
+      <Text className={`mb-[10] color-light-secondary/50 dark:color-dark-secondary/50`}>
         {todayPrayerTimes.HicriTarihUzun} / {todayPrayerTimes.MiladiTarihKisa}
       </Text>
 
-      <Text className="font-bold text-2xl">
+      <Text className="font-bold text-2xl color-light-secondary dark:color-dark-secondary">
         {isImsakTime ? 'İmsak Vaktine Kalan Süre' : ' İftar Vaktine Kalan Süre'}
       </Text>
-      <Text className={`text-[80px] font-extrabold color-[${color.primary}]`}>
+      <Text className={`text-[80px] font-extrabold color-light-primary dark:color-dark-primary`}>
         {isImsakTime ? timeRemainingImsak : timeRemainingAkşam}
       </Text>
       <View className="flex-row gap-[60] -mt-3 ">
-        <Text className={`color-[${color.secondary}]/50`}>saat</Text>
-        <Text className={`color-[${color.secondary}]/50`}>dakika</Text>
-        <Text className={`color-[${color.secondary}]/50`}>saniye</Text>
+        <Text className={`color-light-secondary/50 dark:color-dark-secondary/50`}>saat</Text>
+        <Text className={`color-light-secondary/50 dark:color-dark-secondary/50`}>dakika</Text>
+        <Text className={`color-light-secondary/50 dark:color-dark-secondary/50`}>saniye</Text>
       </View>
     </View>
   );

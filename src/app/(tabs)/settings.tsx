@@ -1,48 +1,40 @@
-import { Switch, Text, View, TouchableOpacity, useColorScheme } from 'react-native';
+import { Switch, Text, View, TouchableOpacity } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useColorScheme } from 'nativewind';
 
 export default function settings() {
-  const deviceColorScheme = useColorScheme(); // Cihazın genel tema tercihini al
-  const [isDarkModeEnabled, setisDarkModeEnabled] = useState(deviceColorScheme === 'dark'); // Default tema tercihi
+  const { toggleColorScheme, colorScheme } = useColorScheme();
 
-  useEffect(() => {
-    // AsyncStorage'den kaydedilmiş tema tercihini al
-    const fetchThemePreference = async () => {
-      try {
-        const storedThemePreference = await AsyncStorage.getItem('darkModeEnabled');
-        setisDarkModeEnabled(storedThemePreference === 'true');
-      } catch (error) {
-        console.error('Error fetching theme preference:', error);
-      }
-    };
-
-    fetchThemePreference();
-  }, []);
-
-  const toggleSwitch = () => {
-    setisDarkModeEnabled((previousState) => !previousState);
-    AsyncStorage.setItem('darkModeEnabled', String(!isDarkModeEnabled)); // Koyu mod durumunu sakla
-    console.warn(isDarkModeEnabled);
+  const toggleSwitch = async () => {
+    try {
+      await AsyncStorage.setItem('mode', colorScheme === 'light' ? 'dark' : 'light');
+      toggleColorScheme();
+    } catch (error) {
+      console.error('Error saving mode:', error);
+    }
   };
 
   return (
-    <View
-      className={`flex-1 justify-center items-center p-16 ${isDarkModeEnabled ? 'bg-[#525252]' : 'bg-[#FFFFFF]'}`}>
-      <View className="flex-row bg-[#EDEDED] w-full h-14 rounded-xl justify-between items-center pl-5">
-        <Text className="font-semibold text-[textColor]">Koyu Mod</Text>
+    <View className="flex-1 justify-center items-center p-16 bg-light-background dark:bg-dark-background">
+      <View className="flex-row bg-light-settingsItem dark:bg-dark-settingsItem w-full h-14 rounded-xl justify-between items-center pl-5">
+        <Text className="font-semibold text-light-secondary dark:text-dark-secondary">
+          Koyu Mod
+        </Text>
         <Switch
           trackColor={{ false: '#DDDDDD', true: '#171717' }}
-          thumbColor={isDarkModeEnabled ? '#DA0037' : '#DA0037'}
+          thumbColor={'#DA0037'}
           ios_backgroundColor="#444444"
           onValueChange={toggleSwitch}
-          value={isDarkModeEnabled}
+          value={colorScheme == 'light' ? false : true}
         />
       </View>
-      <View className="flex-row bg-[#EDEDED] w-full h-14 rounded-xl justify-between items-center pl-5 mt-5">
-        <Text className="font-semibold text-[textColor]">Uygulamayı Sıfırla</Text>
+      <View className="flex-row bg-light-settingsItem dark:bg-dark-settingsItem w-full h-14 rounded-xl justify-between items-center pl-5 mt-5">
+        <Text className="font-semibold text-light-secondary dark:text-dark-secondary">
+          Uygulamayı Sıfırla
+        </Text>
         <TouchableOpacity
           onPress={() => {
             AsyncStorage.clear();

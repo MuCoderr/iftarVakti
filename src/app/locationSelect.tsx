@@ -136,7 +136,7 @@ const DropdownComponent = () => {
   return (
     <>
       <ImageBackground
-        source={require('../assets/images/background.png')}
+        source={require('../assets/images/backgroundLight.png')}
         className="flex-1"
         imageStyle={{ opacity: 0.1 }}>
         <View className=" flex-1 justify-center">

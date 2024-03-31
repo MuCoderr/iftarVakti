@@ -1,17 +1,40 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Tabs } from 'expo-router';
 import { store } from '../../redux/store';
 import { Provider } from 'react-redux';
 import { MaterialIcons } from '@expo/vector-icons';
 import '../../../global.css';
 
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useColorScheme } from 'nativewind';
+
 export default function _layout() {
+  const { colorScheme, setColorScheme } = useColorScheme();
+
+  const getDatas = async () => {
+    try {
+      let mode = await AsyncStorage.getItem('mode');
+      if (!mode) {
+        mode = 'light';
+      }
+      await AsyncStorage.setItem('mode', mode);
+      setColorScheme(mode === 'light' ? 'light' : 'dark');
+    } catch (error) {
+      console.error('Error reading mode:', error);
+    }
+  };
+
+  useEffect(() => {
+    getDatas();
+  }, []);
+
   return (
     <Provider store={store}>
       <Tabs
         screenOptions={{
           tabBarShowLabel: false,
           tabBarActiveTintColor: '#DA0037',
+          tabBarInactiveTintColor: colorScheme == 'dark' ? '#EEEEEE' : '#171717',
           tabBarStyle: {
             position: 'absolute',
             backgroundColor: 'transparent',
