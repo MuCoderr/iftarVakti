@@ -4,6 +4,7 @@ export const lightColors = {
   gray: '#444444',
   background: '#EDEDED',
   settingsItem: '#DDDDDD',
+  settingsItemTwo: '#CCCCCC',
 };
 
 export const darkColors = {
@@ -12,4 +13,5 @@ export const darkColors = {
   gray: '#444444',
   background: '#222831',
   settingsItem: '#31363F',
+  settingsItemTwo: '#393E46',
 };

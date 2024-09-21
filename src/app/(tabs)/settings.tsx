@@ -1,6 +1,7 @@
-import { Switch, Text, View, TouchableOpacity } from 'react-native';
+import { Switch, Text, View, TouchableOpacity, Linking } from 'react-native';
 import React from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useColorScheme } from 'nativewind';
@@ -76,6 +77,31 @@ export default function settings() {
           <MaterialIcons name="restart-alt" size={27} color="#DA0037" />
         </TouchableOpacity>
       </View>
+      <View className="flex-row bg-light-settingsItem dark:bg-dark-settingsItem w-full h-14 rounded-xl justify-between items-center px-10 mt-5">
+        <TouchableOpacity
+          onPress={() => Linking.openURL('https://github.com/MuCoderr')}>
+          <FontAwesome6 name="github" size={26} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => Linking.openURL('https://www.instagram.com/myasinnd/')}>
+          <FontAwesome6 name="instagram" size={26} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => Linking.openURL('https://www.youtube.com/@mucoderr')}>
+          <FontAwesome6 name="youtube" size={26} color="white" />
+        </TouchableOpacity>
+      </View>
+
+      
+    <View className="absolute bottom-10 w-full h-14 rounded-xl  items-center px-10 mt-5">
+      <Text className="font-semibold text-light-settingsItemTwo dark:text-dark-settingsItemTwo">
+        Mücahit Yasin Daşdemir
+      </Text>
+      <Text className="font-semibold text-light-settingsItemTwo dark:text-dark-settingsItemTwo">
+        Version {require('../../../package.json').version}
+      </Text>
     </View>
+    </View>
+    
   );
 }
