@@ -2,7 +2,6 @@ import { Text, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { DateTime, Interval } from 'luxon';
 import { formatTime } from '../utils/functions';
-import { useSelector } from 'react-redux';
 
 interface PrayerTimeItemProps {
   todayPrayerTimes: any;
@@ -10,8 +9,6 @@ interface PrayerTimeItemProps {
 export default function PrayerTimesItem({ todayPrayerTimes }: PrayerTimeItemProps) {
   const [nextPrayer, setNextPrayer] = useState<string>('');
   const [nextVakit, setNextVakit] = useState<string>('');
-
-  const { ramadanMode } = useSelector((state: any) => state.ramadanMode);
 
   useEffect(() => {
     if (todayPrayerTimes) {
@@ -74,33 +71,24 @@ export default function PrayerTimesItem({ todayPrayerTimes }: PrayerTimeItemProp
     }
   }, []);
 
-  const PrayerTimeItem = ({ title, time }: any) => {
-    return (
-      <View className="justify-center items-center mb-[5] mx-2">
-        <Text className="font-bold color-light-secondary dark:color-dark-secondary">{title}</Text>
-        <Text className="font-semibold color-light-primary dark:color-dark-primary">{time}</Text>
-      </View>
-    );
-  };
-
   return (
-    <View className="flex-auto justify-end mb-[90] items-center ">
-      {ramadanMode === true ? (<View className="mb-3">
-        {nextPrayer && (
-          <Text className="font-bold text-2xl color-light-secondary dark:color-dark-secondary">
-            {nextVakit} Vaktine{' '}
-            <Text className="color-light-primary dark:color-dark-primary">{nextPrayer}</Text>
-          </Text>
+    <View className="flex-auto items-center ">
+        <Text className={`mb-[10] color-light-secondary/50 dark:color-dark-secondary/50`}>
+        {todayPrayerTimes.HicriTarihUzun} / {todayPrayerTimes.MiladiTarihKisa}
+      </Text>
+
+      <Text className="font-bold text-2xl color-light-secondary dark:color-dark-secondary">
+        {nextVakit} Vaktine Kalan Süre
+      </Text>
+
+      {nextPrayer && (            
+            <Text className="font-bold text-[80px] color-light-primary dark:color-dark-primary">{nextPrayer}</Text>
         )}
-      </View>): null
-      }
-        <View className=" flex-row">
-        <PrayerTimeItem title="İmsak" time={todayPrayerTimes.Imsak} />
-        <PrayerTimeItem title="Güneş" time={todayPrayerTimes.Gunes} />
-        <PrayerTimeItem title="Öğle" time={todayPrayerTimes.Ogle} />
-        <PrayerTimeItem title="İkindi" time={todayPrayerTimes.Ikindi} />
-        <PrayerTimeItem title="Akşam" time={todayPrayerTimes.Aksam} />
-        <PrayerTimeItem title="Yatsı" time={todayPrayerTimes.Yatsi} />
+        
+      <View className="flex-row gap-[60] -mt-3 ">
+        <Text className={`color-light-secondary/50 dark:color-dark-secondary/50`}>saat</Text>
+        <Text className={`color-light-secondary/50 dark:color-dark-secondary/50`}>dakika</Text>
+        <Text className={`color-light-secondary/50 dark:color-dark-secondary/50`}>saniye</Text>
       </View>
     </View>
   );

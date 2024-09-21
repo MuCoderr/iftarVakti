@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Country } from '../../../redux/types';
+import { Country } from '../types';
 
 const initialState: {
   countries: Country[];

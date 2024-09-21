@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { PrayerTimes } from '../../../redux/types';
+import { PrayerTimes } from '..//types';
 
 const initialState: {
   prayerTimes: PrayerTimes[];
