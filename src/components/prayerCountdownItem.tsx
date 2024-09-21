@@ -5,13 +5,15 @@ import { formatTime } from '../utils/functions';
 
 interface PrayerTimeItemProps {
   todayPrayerTimes: any;
+  tomorrowPrayerTimes: any;
 }
-export default function PrayerTimesItem({ todayPrayerTimes }: PrayerTimeItemProps) {
+
+export default function PrayerTimesItem({ todayPrayerTimes, tomorrowPrayerTimes }: PrayerTimeItemProps) {
   const [nextPrayer, setNextPrayer] = useState<string>('');
   const [nextVakit, setNextVakit] = useState<string>('');
 
   useEffect(() => {
-    if (todayPrayerTimes) {
+    if (todayPrayerTimes && tomorrowPrayerTimes) {
       const timeRemaining = () => {
         const suankiSaat = DateTime.now();
 
@@ -31,9 +33,11 @@ export default function PrayerTimesItem({ todayPrayerTimes }: PrayerTimeItemProp
           const vakitDateTime = DateTime.fromISO(vakitSaat);
           if (vakitDateTime > suankiSaat && !nextPrayerFound) {
             const kalanSureInterval = Interval.fromDateTimes(suankiSaat, vakitDateTime);
-            const kalanSureString: any = kalanSureInterval
+            const kalanSureString = kalanSureInterval
               .toDuration(['hours', 'minutes', 'seconds'])
               .toObject();
+
+            //console.log(`Kalan süre (${vakit}):`, kalanSureString); // Konsola yazdır
 
             let vakitString = '';
             vakit === 'imsak'
@@ -52,14 +56,28 @@ export default function PrayerTimesItem({ todayPrayerTimes }: PrayerTimeItemProp
 
             setNextVakit(`${vakitString}`);
             setNextPrayer(
-              formatTime(kalanSureString.hours, kalanSureString.minutes, kalanSureString.seconds)
+              formatTime(kalanSureString.hours || 0, kalanSureString.minutes || 0, kalanSureString.seconds || 0)
             );
             nextPrayerFound = true;
           }
         }
 
+        // Eğer yatsı vaktinden sonra ise, bir sonraki günün imsak vaktine kalan süreyi hesapla
         if (!nextPrayerFound) {
-          setNextPrayer('');
+          const nextDayImsak = DateTime.fromISO(tomorrowPrayerTimes.Imsak).plus({ days: 1 });
+          const kalanSureInterval = Interval.fromDateTimes(suankiSaat, nextDayImsak);
+          //console.log('Interval:', kalanSureInterval); // Interval nesnesini konsola yazdır
+
+          const kalanSureString = kalanSureInterval
+            .toDuration(['hours', 'minutes', 'seconds'])
+            .toObject();
+
+          //console.log('Kalan süre (imsak):', kalanSureString); // Konsola yazdır
+
+          setNextVakit('İmsak');
+          setNextPrayer(
+            formatTime(kalanSureString.hours || 0, kalanSureString.minutes || 0, kalanSureString.seconds || 0)
+          );
         }
       };
 
@@ -69,11 +87,11 @@ export default function PrayerTimesItem({ todayPrayerTimes }: PrayerTimeItemProp
       // Komponent unmount olduğunda clearInterval kullanarak güncelleme işlemini durdur
       return () => clearInterval(intervalId);
     }
-  }, []);
+  }, [todayPrayerTimes, tomorrowPrayerTimes]);
 
   return (
     <View className="flex-auto items-center ">
-        <Text className={`mb-[10] color-light-secondary/50 dark:color-dark-secondary/50`}>
+      <Text className={`mb-[10] color-light-secondary/50 dark:color-dark-secondary/50`}>
         {todayPrayerTimes.HicriTarihUzun} / {todayPrayerTimes.MiladiTarihKisa}
       </Text>
 
@@ -81,10 +99,10 @@ export default function PrayerTimesItem({ todayPrayerTimes }: PrayerTimeItemProp
         {nextVakit} Vaktine Kalan Süre
       </Text>
 
-      {nextPrayer && (            
-            <Text className="font-bold text-[80px] color-light-primary dark:color-dark-primary">{nextPrayer}</Text>
-        )}
-        
+      {nextPrayer && (
+        <Text className="font-bold text-[80px] color-light-primary dark:color-dark-primary">{nextPrayer}</Text>
+      )}
+      
       <View className="flex-row gap-[60] -mt-3 ">
         <Text className={`color-light-secondary/50 dark:color-dark-secondary/50`}>saat</Text>
         <Text className={`color-light-secondary/50 dark:color-dark-secondary/50`}>dakika</Text>

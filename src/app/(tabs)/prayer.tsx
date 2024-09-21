@@ -65,7 +65,8 @@ export default function Prayer() {
             <LocationItem />
             {todayPrayerTimes ? (
               <>
-                <PrayerCountdownItem todayPrayerTimes={todayPrayerTimes} />
+                <PrayerCountdownItem todayPrayerTimes={todayPrayerTimes} 
+                  tomorrowPrayerTimes={tomorrowPrayerTimes} />
                 <PrayerTimesItem todayPrayerTimes={todayPrayerTimes} />
               </>
             ) : (
