@@ -93,7 +93,7 @@ export default function settings() {
       </View>
 
       
-    <View className="absolute bottom-10 w-full h-14 rounded-xl  items-center px-10 mt-5">
+    <View className="absolute bottom-[40px] w-full h-14 rounded-xl  items-center px-10 mt-5">
       <Text className="font-semibold text-light-settingsItemTwo dark:text-dark-settingsItemTwo">
         Mücahit Yasin Daşdemir
       </Text>
