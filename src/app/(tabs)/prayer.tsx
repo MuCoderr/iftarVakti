@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, ImageBackground, ActivityIndicator, Text } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, ImageBackground, ActivityIndicator } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 // Components
 import LocationItem from '../../components/locationItem';
@@ -10,15 +10,24 @@ import PrayerCountdownItem from '../../components/prayerCountdownItem';
 import { useColorScheme } from 'nativewind';
 // Redux
 import { useSelector } from 'react-redux';
+import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
+import AlarmBottomSheet from '~/src/components/alarmBottomSheet';
 
 export default function Prayer() {
   const [districtID, setDistrictID] = useState(null);
   const [todayPrayerTimes, setTodayPrayerTimes] = useState<any | null>(null);
   const [tomorrowPrayerTimes, setTomorrowPrayerTimes] = useState<any | null>(null);
 
+  const { ramadanMode } = useSelector((state: any) => state.ramadanMode);
+  
   const { colorScheme } = useColorScheme();
 
-  const { ramadanMode } = useSelector((state: any) => state.ramadanMode);
+  //BottomSheet
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+  const {dismiss} = useBottomSheetModal();
+  const handlePresentBottomSheet = () => { 
+    bottomSheetRef.current?.present();
+  };
 
   useEffect(() => {
     const getDistrictValue = async () => {
@@ -27,6 +36,7 @@ export default function Prayer() {
     };
     getDistrictValue();
   }, [districtID]);
+
 
   return (
     <>
@@ -52,7 +62,10 @@ export default function Prayer() {
                   todayPrayerTimes={todayPrayerTimes}
                   tomorrowPrayerTimes={tomorrowPrayerTimes}
                 />
-                <PrayerTimesItem todayPrayerTimes={todayPrayerTimes} />
+                <PrayerTimesItem openBottomSheet={handlePresentBottomSheet} todayPrayerTimes={todayPrayerTimes} />
+                <AlarmBottomSheet 
+                  ref={bottomSheetRef} 
+                  dismiss={dismiss} />
               </>
             ) : (
               <View className="flex-1 justify-center items-center">
@@ -67,7 +80,11 @@ export default function Prayer() {
               <>
                 <PrayerCountdownItem todayPrayerTimes={todayPrayerTimes} 
                   tomorrowPrayerTimes={tomorrowPrayerTimes} />
-                <PrayerTimesItem todayPrayerTimes={todayPrayerTimes} />
+                <PrayerTimesItem openBottomSheet={handlePresentBottomSheet} todayPrayerTimes={todayPrayerTimes} />
+                <AlarmBottomSheet 
+                todayPrayerTimes={todayPrayerTimes}
+                  ref={bottomSheetRef} 
+                  dismiss={dismiss} />
               </>
             ) : (
               <View className="flex-1 justify-center items-center">

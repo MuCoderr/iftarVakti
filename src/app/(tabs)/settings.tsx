@@ -14,7 +14,7 @@ export default function settings() {
 
   const dispatch = useDispatch();
   const { ramadanMode } = useSelector((state: any) => state.ramadanMode);
-
+  
   const toggleThemeSwitch = async () => {
     try {
       await AsyncStorage.setItem('mode', colorScheme === 'light' ? 'dark' : 'light');
@@ -26,8 +26,8 @@ export default function settings() {
 
   const toogleRamadanModeSwitch = async () => {
     try {
-      await AsyncStorage.setItem('ramadanMode', JSON.stringify(ramadanMode==true ? false : true));
-      dispatch(toggleRamadanMode(ramadanMode==true ? false : true));
+      await AsyncStorage.setItem('ramadanMode', JSON.stringify(ramadanMode == true ? false : true));
+      dispatch(toggleRamadanMode(ramadanMode == true ? false : true));
 
       // console.warn(ramadanMode);
     } catch (error) {
@@ -60,13 +60,12 @@ export default function settings() {
           thumbColor={'#DA0037'}
           ios_backgroundColor="#444444"
           onValueChange={toogleRamadanModeSwitch}
-          value={JSON.stringify(ramadanMode )== "true" ? true : false}
+          value={JSON.stringify(ramadanMode) == "true" ? true : false}
         />
       </View>
       <View className="flex-row bg-light-settingsItem dark:bg-dark-settingsItem w-full h-14 rounded-xl justify-between items-center pl-5 mt-5">
         <Text className="font-semibold text-light-secondary dark:text-dark-secondary">
           Uygulamayı Sıfırla
-
         </Text>
         <TouchableOpacity
           onPress={() => {
@@ -91,17 +90,14 @@ export default function settings() {
           <FontAwesome6 name="youtube" size={26} color="white" />
         </TouchableOpacity>
       </View>
-
-      
-    <View className="absolute bottom-[40px] w-full h-14 rounded-xl  items-center px-10 mt-5">
-      <Text className="font-semibold text-light-settingsItemTwo dark:text-dark-settingsItemTwo">
-        Mücahit Yasin Daşdemir
-      </Text>
-      <Text className="font-semibold text-light-settingsItemTwo dark:text-dark-settingsItemTwo">
-        Version {require('../../../package.json').version}
-      </Text>
+      <View className="absolute bottom-[40px] w-full h-14 rounded-xl  items-center px-10 mt-5">
+        <Text className="font-semibold text-light-settingsItemTwo dark:text-dark-settingsItemTwo">
+          Mücahit Yasin Daşdemir
+        </Text>
+        <Text className="font-semibold text-light-settingsItemTwo dark:text-dark-settingsItemTwo">
+          Version {require('../../../package.json').version}
+        </Text>
+      </View>
     </View>
-    </View>
-    
   );
 }

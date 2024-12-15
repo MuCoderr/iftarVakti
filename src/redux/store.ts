@@ -4,6 +4,7 @@ import citiesReducer from './slices/cities';
 import districtsReducer from './slices/districts';
 import prayerTimesReducer from './slices/prayerTimes';
 import ramadanModeReducer from './slices/ramadanMode';
+import selectedPrayerTimeReducer from './slices/selectedPrayerTimesItem';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     districts: districtsReducer,
     prayerTimes: prayerTimesReducer,
     ramadanMode: ramadanModeReducer,
+    selectedPrayerTime: selectedPrayerTimeReducer,
   },
 });
 
